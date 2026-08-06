@@ -1,4 +1,5 @@
 <p class="other-formats">
-  <%= link_to l(:label_history_main_search), search_status_history_path(@project) if User.current.allowed_to?(:search_status_history, @project) %>
+  <% if @project && User.current.allowed_to?(:search_status_history, @project) %>
+    <%= link_to l(:label_history_main_search), search_status_history_path(@project) %>
+  <% end %>
 </p>
-

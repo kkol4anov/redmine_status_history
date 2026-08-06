@@ -1,32 +1,36 @@
 require 'redmine'
 
+plugin_lib = File.expand_path('lib', __dir__)
+$LOAD_PATH.unshift(plugin_lib) unless $LOAD_PATH.include?(plugin_lib)
+
+require 'redmine_status_history/patches/issue_patch'
+require 'redmine_status_history/patches/issue_query_patch'
+require 'redmine_status_history/patches/journal_detail_patch'
+
+unless Issue.include?(RedmineStatusHistory::Patches::IssuePatch)
+  Issue.include(RedmineStatusHistory::Patches::IssuePatch)
+end
+unless IssueQuery.include?(RedmineStatusHistory::Patches::IssueQueryPatch)
+  IssueQuery.include(RedmineStatusHistory::Patches::IssueQueryPatch)
+end
+unless JournalDetail.include?(RedmineStatusHistory::Patches::JournalDetailPatch)
+  JournalDetail.include(RedmineStatusHistory::Patches::JournalDetailPatch)
+end
+
+require 'redmine_status_history/hooks/view_issues_index_bottom'
+
 Redmine::Plugin.register :redmine_status_history do
-  name 'Redmine Status History plugin'
-  author '@redmineservices'
-  description 'This is a plugin for Redmine'
-  version '1.0.2'
-  url 'http://redmineservices.com'
-  author_url 'mailto:info@redmineservices.com'
-  
+  name 'Redmine Status History'
+  author 'Redmine Services'
+  description 'Searches, displays and filters issue status change history'
+  version '2.0.0'
+  url 'https://github.com/redmineservices/redmine_status_history'
+  author_url 'https://github.com/redmineservices'
+  requires_redmine version_or_higher: '5.0.0'
+
   project_module :issue_tracking do
-    permission :search_status_history, {}, :require => :member
-  end
-
-  require File.expand_path('lib/redmine_status_history/hooks/view_issues_index_bottom', __dir__)
-  require File.expand_path('lib/redmine_status_history/patches/issue_patch', __dir__)
-  require File.expand_path('lib/redmine_status_history/patches/journal_detail_patch', __dir__)
-
-  if Rails.configuration.respond_to?(:autoloader) && Rails.configuration.autoloader == :zeitwerk
-    Rails.autoloaders.each { |loader| loader.ignore(File.expand_path('lib/redmine_status_history', __dir__)) }
-  end
-
-  if Rails.version > '6.0' && Rails.autoloaders.zeitwerk_enabled?
-    JournalDetail.send(:include, RedmineStatusHistory::Patches::JournalDetailPatch)
-    Issue.send(:include, RedmineStatusHistory::Patches::IssuePatch)
-  else
-    Rails.configuration.to_prepare do
-      JournalDetail.send(:include, RedmineStatusHistory::Patches::JournalDetailPatch)
-      Issue.send(:include, RedmineStatusHistory::Patches::IssuePatch)
-    end
+    permission :search_status_history,
+               { status_histories: %i[search show_history] },
+               require: :member
   end
 end

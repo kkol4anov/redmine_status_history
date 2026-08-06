@@ -1,9 +1,8 @@
-# Turkish strings go here for Rails i18n
 tr:
-  # my_label: "My label"
-  
+  permission_search_status_history: Sorun durum geçmişini ara
+  error_status_history_invalid_date: Geçerli bir tarih aralığı girin
+
   label_history_main_search: Durum değişikliği ara
-  
   label_history_status_from: Önceki durumu
   label_history_status_to: Sonraki durumu
   label_history_date_from: Tarihinden
@@ -11,4 +10,4 @@ tr:
   label_history_view_history: Geçmişini gör
   label_history_issue_creation: Oluşturulma
   label_history_current_status: Şimdiki durumu
-
+  field_last_status_update: Son durum değişikliği

@@ -1,46 +1,48 @@
-class PopulateIssueStatusHistory < (Rails.version < '5.2' ? ActiveRecord::Migration : ActiveRecord::Migration[4.2])
-  def change
-    
-    Issue.find_each do |i|
-      last_change = nil
-    
-      changes = i.journals.collect {|j| j.details.select {|d| d.prop_key == 'status_id' }}.flatten.sort
-      if changes
-        puts "Issue ##{i.id} - #{changes.count} changes "
-        changes.each do |c|
-          if last_change.nil?
-            status_history = {
-              :from => i.created_on,
-              :status_id => c.old_value,
-              :user_id => i.author_id,
-              :issue_id => i.id,
-              :to => c.journal.created_on
-            }
-            last_change = IssueStatusHistory.create!(status_history)            
-          else
-            last_change.to = c.journal.created_on
-            last_change.save
-          end
-          
-          status_history = {
-            :from => c.journal.created_on,
-            :status_id => c.value,
-            :user_id => c.journal.user_id,
-            :journal_id => c.journal_id,
-            :previous_status_id => c.old_value,
-            :issue_id => c.journal.journalized_id
-          }
-          last_change = IssueStatusHistory.create!(status_history)            
+class PopulateIssueStatusHistory < ActiveRecord::Migration[6.1]
+  def up
+    history_class = Class.new(ActiveRecord::Base) do
+      self.table_name = 'issue_status_histories'
+    end
+
+    Issue.find_each do |issue|
+      changes = issue.journals.includes(:details).flat_map do |journal|
+        journal.details.select { |detail| detail.property == 'attr' && detail.prop_key == 'status_id' }
+      end.sort_by { |detail| [detail.journal.created_on || Time.at(0), detail.id] }
+
+      if changes.any?
+        first_change = changes.first
+        last_change = history_class.create!(
+          from: issue.created_on,
+          to: first_change.journal.created_on,
+          status_id: first_change.old_value.presence || issue.status_id,
+          user_id: issue.author_id,
+          issue_id: issue.id
+        )
+
+        changes.each do |change|
+          changed_at = change.journal.created_on
+          last_change.update_columns(to: changed_at) unless last_change.to == changed_at
+          last_change = history_class.create!(
+            from: changed_at,
+            status_id: change.value,
+            user_id: change.journal.user_id,
+            journal_id: change.journal_id,
+            previous_status_id: change.old_value,
+            issue_id: issue.id
+          )
         end
       else
-        status_history = {
-          :from => i.created_on,
-          :status_id => i.status_id,
-          :user_id => i.author_id,
-          :issue_id => i.id
-        }
-        IssueStatusHistory.create!(status_history)
+        history_class.create!(
+          from: issue.created_on,
+          status_id: issue.status_id,
+          user_id: issue.author_id,
+          issue_id: issue.id
+        )
       end
-    end    
+    end
+  end
+
+  def down
+    execute 'DELETE FROM issue_status_histories' if table_exists?(:issue_status_histories)
   end
 end

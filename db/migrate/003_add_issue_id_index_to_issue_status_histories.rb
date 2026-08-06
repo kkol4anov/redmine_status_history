@@ -1,9 +1,9 @@
-class AddIssueIdIndexToIssueStatusHistories < (Rails.version < '5.2' ? ActiveRecord::Migration : ActiveRecord::Migration[4.2])
-  def self.up
-    add_index :issue_status_histories, :issue_id
+class AddIssueIdIndexToIssueStatusHistories < ActiveRecord::Migration[6.1]
+  def up
+    add_index :issue_status_histories, :issue_id unless index_exists?(:issue_status_histories, :issue_id)
   end
 
-  def self.down
-    remove_index :issue_status_histories, :issue_id
+  def down
+    remove_index :issue_status_histories, :issue_id if index_exists?(:issue_status_histories, :issue_id)
   end
 end

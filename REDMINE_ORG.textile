@@ -1,0 +1,52 @@
+h1. Redmine Status History
+
+Records every issue status interval and provides a project-level search for
+status transitions between dates. It also adds the last status-change date as
+an issue query filter and sortable column.
+
+h2. Features
+
+* Search by previous status, destination status and date range.
+* Display the complete status timeline for an issue.
+* Filter and sort issue queries by the last status-change date.
+* Restrict access using a project permission.
+
+h2. Compatibility
+
+* Redmine 5.0.x and 5.1.x
+* Redmine 6.0.x and 6.1.x
+* Ruby 3.1 to 3.3
+
+h2. Installation
+
+From the Redmine installation directory:
+
+<pre>
+cd plugins
+git clone https://github.com/redmineservices/redmine_status_history.git
+cd ..
+bundle exec rake redmine:plugins:migrate NAME=redmine_status_history RAILS_ENV=production
+</pre>
+
+Restart Redmine and grant *Search issue status history* to the appropriate
+roles under *Administration → Roles and permissions*. The initial migration
+reconstructs existing history and can take time on large installations.
+
+h2. Upgrade
+
+Back up the database, replace the plugin files, run the migration command above
+and restart Redmine.
+
+h2. Uninstallation
+
+<pre>
+bundle exec rake redmine:plugins:migrate NAME=redmine_status_history VERSION=0 RAILS_ENV=production
+</pre>
+
+Remove @plugins/redmine_status_history@ and restart Redmine.
+
+h2. Source and support
+
+Source: https://github.com/redmineservices/redmine_status_history
+
+Security reports: info@redmineservices.com

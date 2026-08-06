@@ -1,5 +1,7 @@
 module RedmineStatusHistory
-  class ViewHooks < Redmine::Hook::ViewListener
-    render_on :view_issues_index_bottom, :partial => 'hooks/hook_link_to_status_history_search'
+  module Hooks
+    class ViewIssuesIndexBottom < Redmine::Hook::ViewListener
+      render_on :view_issues_index_bottom, partial: 'hooks/hook_link_to_status_history_search'
+    end
   end
 end

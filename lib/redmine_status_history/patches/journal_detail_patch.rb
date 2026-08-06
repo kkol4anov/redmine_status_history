@@ -1,38 +1,36 @@
-require_dependency 'journal_detail'
-
 module RedmineStatusHistory
   module Patches
     module JournalDetailPatch
       def self.included(base) # :nodoc:
         base.send(:include, InstanceMethods)
         base.class_eval do
-          unloadable # Send unloadable so it will not be unloaded in development
-          has_one :issue_status_history, :dependent => :delete
-          
           after_create :create_history
         end
-      end 
-      
-      module InstanceMethods     
+      end
+
+      module InstanceMethods
         def create_history
-          last_change = self.journal.issue.issue_status_histories.last
-          if self.prop_key == 'status_id'
-            status_history = {
-              :from => self.journal.created_on,
-              :status_id => self.value,
-              :user_id => self.journal.user_id,
-              :journal_id => self.journal_id,
-              :previous_status_id => self.old_value,
-              :issue_id => self.journal.journalized_id
-            }
-            IssueStatusHistory.create(status_history)
-            if last_change && self.journal
-              last_change.to = self.journal.created_on
-              last_change.save      
-            end                          
+          return unless prop_key == 'status_id'
+          return unless journal&.journalized.is_a?(Issue)
+          return if IssueStatusHistory.exists?(journal_id: journal_id)
+
+          issue = journal.journalized
+          changed_at = journal.created_on || Time.current
+
+          IssueStatusHistory.transaction do
+            last_change = issue.issue_status_histories.chronological.last
+            IssueStatusHistory.create!(
+              from: changed_at,
+              status_id: value,
+              user_id: journal.user_id,
+              journal_id: journal_id,
+              previous_status_id: old_value,
+              issue_id: issue.id
+            )
+            last_change&.update!(to: changed_at)
           end
         end
-      end            
+      end
     end
   end
 end
