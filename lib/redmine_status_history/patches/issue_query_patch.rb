@@ -8,7 +8,7 @@ module RedmineStatusHistory
       module InstanceMethods
         def initialize_available_filters
           super
-          add_available_filter 'last_status_update', type: :date unless available_filters.key?('last_status_update')
+          add_available_filter 'last_status_update', type: :date
         end
 
         def available_columns

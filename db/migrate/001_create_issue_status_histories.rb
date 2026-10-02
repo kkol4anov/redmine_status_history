@@ -1,4 +1,4 @@
-class CreateIssueStatusHistories < ActiveRecord::Migration[6.1]
+class CreateIssueStatusHistories < ActiveRecord::Migration[5.2]
   def up
     return if table_exists?(:issue_status_histories)
 

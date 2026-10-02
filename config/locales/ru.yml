@@ -1,0 +1,12 @@
+ru:
+  permission_search_status_history: Поиск по истории статусов задач
+  error_status_history_invalid_date: Укажите корректный диапазон дат
+  label_history_main_search: Поиск изменений статусов
+  label_history_status_from: Предыдущий статус
+  label_history_status_to: Новый статус
+  label_history_date_from: С даты
+  label_history_date_to: По дату
+  label_history_view_history: История статусов
+  label_history_issue_creation: Создание
+  label_history_current_status: Текущий статус
+  field_last_status_update: Последнее изменение статуса
