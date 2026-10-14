@@ -29,7 +29,7 @@ Redmine::Plugin.register :redmine_status_history do
   name 'Redmine Status History'
   author 'Redmine Services / Konstantin Kolchanov'
   description 'Searches, displays and filters issue status change history'
-  version '1.0.0.rc1'
+  version '1.0.0'
   url 'https://github.com/kkol4anov/redmine_status_history'
   author_url 'https://github.com/redmineservices'
   requires_redmine version_or_higher: '4.2.9'
