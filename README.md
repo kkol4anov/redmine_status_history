@@ -1,10 +1,5 @@
 # Redmine Status History
 
-[![Tests](https://github.com/redmineservices/redmine_status_history/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/redmineservices/redmine_status_history/actions/workflows/test.yml)
-[![Release](https://img.shields.io/github/v/release/redmineservices/redmine_status_history)](https://github.com/redmineservices/redmine_status_history/releases/latest)
-![Redmine](https://img.shields.io/badge/Redmine-5.x%20%7C%206.x-B32024)
-![Ruby](https://img.shields.io/badge/Ruby-3.1--3.3-CC342D?logo=ruby&logoColor=white)
-[![License](https://img.shields.io/github/license/redmineservices/redmine_status_history)](LICENSE)
 
 `redmine_status_history` records every issue status interval and provides a
 project-level search for transitions between statuses and dates. It also adds
@@ -18,7 +13,15 @@ the last status-change date as an issue query filter and column.
 - Filter and sort issue queries by the last status-change date.
 - Restrict access with a project permission.
 
-## Compatibility
+## Redmine 4.2 compatibility backport
+
+This local backport targets Redmine 4.2.9, Rails 5.2.8.1, Ruby 2.7.4-p191
+and MariaDB 10.5.18 with the mysql2 adapter. It adds no
+runtime gems. The target stack has not been executed in the patch author's
+environment; the upstream CI results below do not certify this backport.
+Version of the plugin was downgraded to 1.0.0. It will be maintained independent of upstream.
+
+## Upstream compatibility (before this backport)
 
 | Plugin | Redmine | Rails |
 | --- | --- | --- |
@@ -27,6 +30,12 @@ the last status-change date as an issue query filter and column.
 
 The CI matrix covers Redmine 5.0.14, 5.1.13, 6.0.10 and 6.1.3. Redmine 5.x
 is supported by this plugin even though it is no longer maintained upstream.
+
+## Compatibility after this backport
+
+| Plugin | Redmine | Rails | Ruby | MariaDB |
+| --- | --- | --- | --- | --- |
+| 1.x.x | 4.2.9 | 5.2.8.1 | 2.7.4-p191 | 10.5.18 |
 
 ## Installation
 

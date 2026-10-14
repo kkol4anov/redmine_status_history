@@ -74,4 +74,57 @@ class IssueStatusHistoryTest < ActiveSupport::TestCase
     assert_equal 1, query.available_filters.keys.count('last_status_update')
     assert_equal 1, query.available_columns.count { |column| column.name == :last_status_update }
   end
+
+  test 'creates initial history when an issue is saved' do
+    issue = Issue.new(project: Project.find(1), tracker: Tracker.find(1),
+                      author: @user, subject: 'Status history callback',
+                      status: IssueStatus.find(1), priority: IssuePriority.first)
+
+    assert_difference 'IssueStatusHistory.count', 1 do
+      issue.save!
+    end
+    history = issue.issue_status_histories.first
+    assert_equal issue.status_id, history.status_id
+    assert_equal issue.created_on.to_i, history.from.to_i
+    assert_equal history.from, issue.reload.last_status_update
+  end
+
+  test 'ignores non attribute journal details named status_id' do
+    journal = Journal.create!(journalized: @issue, user: @user)
+
+    assert_no_difference 'IssueStatusHistory.count' do
+      JournalDetail.create!(journal: journal, property: 'cf', prop_key: 'status_id',
+                            old_value: '1', value: '2')
+    end
+  end
+
+  test 'repeated preparation does not duplicate callbacks or columns' do
+    2.times { Rails.application.reloader.prepare! }
+
+    issue_callbacks = Issue._create_callbacks.select do |callback|
+      callback.filter == :create_status_history
+    end
+    detail_callbacks = JournalDetail._create_callbacks.select do |callback|
+      callback.filter == :create_history
+    end
+    assert_equal 1, issue_callbacks.size
+    assert_equal 1, detail_callbacks.size
+    query = IssueQuery.new(project: Project.find(1), user: @user)
+    2.times do
+      assert_equal 1, query.available_columns.count { |column| column.name == :last_status_update }
+      assert query.available_filters.key?('last_status_update')
+    end
+  end
+
+  test 'date filter and sorting execute through the configured adapter' do
+    history = IssueStatusHistory.create!(issue: @issue, status: @issue.status,
+                                         user: @user, from: Time.zone.parse('2026-08-03 12:00'))
+    query = IssueQuery.new(project: Project.find(1), user: @user)
+    query.filters = {}
+    query.add_filter('last_status_update', '=', ['2026-08-03'])
+    query.sort_criteria = [['last_status_update', 'desc']]
+
+    assert_includes query.issues.map(&:id), history.issue_id
+  end
+
 end

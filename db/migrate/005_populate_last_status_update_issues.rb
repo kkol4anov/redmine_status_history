@@ -1,4 +1,4 @@
-class PopulateLastStatusUpdateIssues < ActiveRecord::Migration[6.1]
+class PopulateLastStatusUpdateIssues < ActiveRecord::Migration[5.2]
   def up
     history_class = Class.new(ActiveRecord::Base) do
       self.table_name = 'issue_status_histories'

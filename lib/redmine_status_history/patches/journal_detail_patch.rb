@@ -10,7 +10,7 @@ module RedmineStatusHistory
 
       module InstanceMethods
         def create_history
-          return unless prop_key == 'status_id'
+          return unless property == 'attr' && prop_key == 'status_id'
           return unless journal&.journalized.is_a?(Issue)
           return if IssueStatusHistory.exists?(journal_id: journal_id)
 

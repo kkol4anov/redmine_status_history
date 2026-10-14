@@ -1,4 +1,4 @@
-class AddIssueStatusHistoryIndexes < ActiveRecord::Migration[6.1]
+class AddIssueStatusHistoryIndexes < ActiveRecord::Migration[5.2]
   def up
     issue_from_index = 'index_status_histories_on_issue_and_from'
     unless index_exists?(:issue_status_histories, %i[issue_id from], name: issue_from_index)
