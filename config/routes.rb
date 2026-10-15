@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  get 'projects/:project_id/status_ledger', to: 'status_ledger#index', as: 'project_status_ledger'
   match 'projects/:project_id/issue_status_history/search',
         to: 'status_histories#search', via: %i[get post], as: 'search_status_history'
   get 'projects/:project_id/issue_status_history/:issue_id',

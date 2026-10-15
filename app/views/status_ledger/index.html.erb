@@ -1,0 +1,63 @@
+<h2><%= l(:label_status_ledger) %><%= " — #{@query.name}" unless @query.new_record? %></h2>
+<div class="tabs"><ul>
+  <% %w[transitions intervals].each do |kind| %>
+    <li><%= link_to l("label_sh_#{kind}"), project_status_ledger_path(@project,
+      set_filter: '1', f: ['entry_kind', 'work_period'],
+      op: { entry_kind: '=', work_period: 'm' }, v: { entry_kind: [kind], work_period: [''] }),
+      class: ((@query.transitions? ? 'transitions' : 'intervals') == kind ? 'selected' : nil) %></li>
+  <% end %>
+</ul></div>
+<p><%= l(:text_sh_help) %></p>
+<% if @missing_count.to_i > 0 %>
+  <div class="flash warning"><%= l(:text_sh_backfill, count: @missing_count) %></div>
+<% end %>
+<%= form_tag(project_status_ledger_path(@project), method: :get, id: 'query_form') do %>
+  <%= render partial: 'queries/query_form' %>
+<% end %>
+
+<% if @query.valid? %>
+  <%= render_query_totals(@query) %>
+  <% if @entries.empty? %>
+    <p class="nodata"><%= l(:label_no_data) %></p>
+  <% else %>
+    <div class="autoscroll">
+    <table class="list odd-even">
+      <thead><tr>
+        <% @query.inline_columns.each do |column| %><%= column_header(@query, column) %><% end %>
+        <th><%= l(:label_history) %></th>
+      </tr></thead>
+      <tbody>
+      <% grouped_query_results(@entries, @query) do |entry, group_name, group_count, group_totals| %>
+        <% if group_name %>
+          <tr class="group open"><td colspan="<%= @query.inline_columns.size + 1 %>">
+            <span class="name"><%= group_name %></span>
+            <span class="count"><%= group_count %></span>
+            <span class="totals"><%= group_totals %></span>
+          </td></tr>
+        <% end %>
+        <tr>
+          <% @query.inline_columns.each do |column| %>
+            <td><% if [:started_at, :ended_at].include?(column.name) %>
+              <%= format_time(entry.public_send(column.name)) if entry.public_send(column.name) %>
+            <% elsif [:elapsed_hours, :previous_status_hours].include?(column.name) %>
+              <%= number_with_precision(entry.public_send(column.name), precision: 2) if entry.public_send(column.name) %>
+            <% else %><%= column_content(column, entry) %><% end %></td>
+          <% end %>
+          <td><%= link_to "##{entry.event_id}", issue_path(entry.issue_id, anchor: "change-#{entry.event_id}") if entry.event_id > 0 %></td>
+        </tr>
+      <% end %>
+      </tbody>
+    </table>
+    </div>
+    <span class="pagination"><%= pagination_links_full @entry_pages, @entry_count %></span>
+    <p><%= link_to 'CSV', project_status_ledger_path(@project, @query.as_params.merge(format: 'csv')) %></p>
+  <% end %>
+<% end %>
+
+<% content_for :sidebar do %>
+  <h3><%= l(:label_query_plural) %></h3>
+  <% (@saved_queries || []).each do |query| %>
+    <p><%= link_to query.name, project_status_ledger_path(@project, query_id: query.id) %></p>
+  <% end %>
+<% end %>
+<% html_title l(:label_status_ledger) %>

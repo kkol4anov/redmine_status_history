@@ -1,4 +1,30 @@
 en:
+  label_status_ledger: Status history
+  label_sh_mode: View
+  label_sh_transitions: Status transitions
+  label_sh_intervals: Assignee intervals
+  label_sh_period: Transition date / accounting period
+  label_sh_status: Status after event / interval status
+  label_sh_previous_status: Status before event
+  label_sh_assigned_to_id: Assignee after event / interval assignee
+  label_sh_previous_assignee_id: Assignee before event
+  label_sh_author_id: Event author
+  label_sh_start: Event date / interval start
+  label_sh_end: Interval end
+  label_sh_hours: Interval hours within period
+  label_sh_previous_hours: Hours in previous status (all assignees)
+  label_sh_status_from: 'History: transition from status'
+  label_sh_status_to: 'History: transition to status'
+  label_sh_changed_on: 'History: transition date'
+  label_sh_executor: 'History: interval assignee'
+  label_sh_work_status_id: 'History: interval status'
+  label_sh_work_period: 'History: work period'
+  label_sh_interval_hours: 'History: hours of one interval within period'
+  error_sh_mode: Select exactly one view using the equals operator.
+  error_sh_period: Select a valid period; the empty operator is not supported.
+  error_sh_export_limit: 'Export exceeds %{limit} rows. Narrow the period or add filters.'
+  text_sh_help: 'Transitions: one row per status change. Intervals: one row per unchanged status and assignee, clipped to the accounting period. Hours are elapsed calendar hours, not effort. Issue fields and custom fields show current values. Select working statuses for work analysis; group assignments are not distributed among members.'
+  text_sh_backfill: 'History is not prepared for %{count} visible issues in this project. Ask an administrator to rebuild intervals.'
   permission_search_status_history: Search issue status history
   error_status_history_invalid_date: Enter a valid date range
 
